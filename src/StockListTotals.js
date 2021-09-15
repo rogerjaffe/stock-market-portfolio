@@ -2,9 +2,9 @@ import utilities from './utilities';
 
 function StockListTotals(props) {
   
-  const { stocks } = props;
+  const { portfolioData } = props;
   
-  const totals = stocks.reduce((summary, stock) => {
+  const totals = portfolioData.reduce((summary, stock) => {
     summary.profit += stock.profit;
     summary.purchaseValue += stock.purchaseValue;
     summary.currentValue += stock.currentValue;
@@ -14,6 +14,7 @@ function StockListTotals(props) {
 
   return (
     <tr>
+      <th></th>
       <th>TOTALS</th>
       <th colSpan="3">&nbsp;</th>
       <th className="money">{utilities.formatNumber(totals.purchaseValue)}</th>

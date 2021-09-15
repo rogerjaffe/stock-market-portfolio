@@ -4,8 +4,8 @@ import StockListItem from './StockListItem';
 import StockListTotals from './StockListTotals';
 
 function StockList(props) {
-  
-  const sortedStockList = props.data.sort((a,b) => a.name < b.name ? -1 : 1); 
+
+  const sortedStockList = props.portfolioData.sort((a,b) => a.name < b.name ? -1 : 1); 
   
   return (
     <Table>
@@ -14,11 +14,11 @@ function StockList(props) {
       </thead>
       <tbody>
         {
-          sortedStockList.map((stock, idx) => <StockListItem key={idx} stock={stock} /> )
+          sortedStockList.map((item, idx) => <StockListItem key={idx} portfolioItem={item} getPortfolio={props.getPortfolio} /> )
         }
       </tbody>
       <tfoot>
-        <StockListTotals stocks={props.data} />
+        <StockListTotals portfolioData={props.portfolioData} />
       </tfoot>
     </Table>
   );
