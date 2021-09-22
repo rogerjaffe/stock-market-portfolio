@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import './App.css';
 import { Card, CardHeader, CardBody, CardFooter, Button } from 'reactstrap';
 import StockList from './StockList';
+import AddStockForm from './AddStockForm';
 import utilities from './utilities';
 
 function App() {
@@ -17,6 +18,8 @@ function App() {
   const [tickerList, setTickerList] = useState([]);
   const [stockPrices, setStockPrices] = useState({});
   const [portfolioData, setPortfolioData] = useState([]);
+  const [showAddStockForm, setShowAddStockForm] = useState(false);
+
   const getPortfolio = () => {
     const options = {
       method: 'POST',
@@ -31,8 +34,7 @@ function App() {
         return response.json();
       })
       .then(function(response) {
-        let lambdaResponse = JSON.parse(response.body);
-        let stocks = lambdaResponse.Items.map(item =>{
+        let stocks = response.Items.map(item =>{
           return {
             purchasePrice: item.purchasePrice.N,
             ticker: item.ticker.S,
@@ -61,7 +63,9 @@ function App() {
           body: JSON.stringify({ticker: ticker})
         }
       fetch(GET_STOCK_PRICE, fetchOptions)
-        .then(response => response.json())
+        .then(response => {
+          return response.json()
+        })
         .then(response => {
           resolve(response);
         })
@@ -89,8 +93,8 @@ function App() {
         const stockPrices = stocks.reduce((obj, stock) => {
           if (stock) {
             const info = {
-              name: stock.data.longName,
-              price: stock.data.regularMarketPrice
+              name: stock.data ? stock.data.longName : null,
+              price: stock.data ? stock.data.regularMarketPrice : null
             }
             obj[stock.ticker] = info;
           }
@@ -123,24 +127,43 @@ function App() {
   }, [stocks, stockPrices]);
   
   const addStock = evt => {
-    console.log('add stock clicked');
+    setShowAddStockForm(value => !value);
+  }
+  
+  const closeAddStockForm = () => {
+    setShowAddStockForm(false);
   }
 
-  return (
-    <div className="App">
-      <Card>
-        <CardHeader className="card-header-color">
-          <h4>{myName}'s Stock Portfolio</h4>
-        </CardHeader>
-        <CardBody>
-          <StockList portfolioData={portfolioData} getPortfolio={getPortfolio} />
-        </CardBody>
-        <CardFooter>
-          <Button size="sm" onClick={addStock}>Add stock</Button>
-        </CardFooter>
-      </Card>
-    </div>
-  );
+  if (showAddStockForm) {
+    return (
+      <div className="App">
+        <Card>
+          <CardHeader className="card-header-color">
+            <h4>{myName}'s Stock Portfolio</h4>
+          </CardHeader>
+          <CardBody>
+            <AddStockForm getPortfolio={getPortfolio} closeAddStockForm={closeAddStockForm} /> 
+          </CardBody>
+        </Card>
+      </div>
+    );
+  } else {
+    return (
+      <div className="App">
+        <Card>
+          <CardHeader className="card-header-color">
+            <h4>{myName}'s Stock Portfolio</h4>
+          </CardHeader>
+          <CardBody>
+            <StockList portfolioData={portfolioData} getPortfolio={getPortfolio} /> 
+          </CardBody>
+          <CardFooter>
+            <Button size="sm" onClick={addStock}>Add stock</Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
 }
 
 export default App;
